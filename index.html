@@ -1,0 +1,113 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Photo Business</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
+</head>
+<link rel="stylesheet" href="css/page.css">
+<link rel="stylesheet" href="photoviewer.css">
+<script type="text/javascript" src="photoviewer.js"></script>
+<script type="text/javascript" src="photoviewer-touch.js"></script>
+<script type="text/javascript" src="xscroll.js"></script>
+</head>
+<body>
+   <div id="container">
+      <div id="page">
+         <a name="portfolio" style="position: relative; top: -36px"></a>
+         <h2>Our works</h2>
+         <div class="grid">
+            <div class="thumb"></div><div class="thumb"></div><div class="thumb"></div><div class="thumb"></div><div class="thumb"></div><div class="thumb"></div><button>Load More</button>
+         </div>
+         <div class="slider scrollable scroll_x" scroll-size="26" button-size="0" thumb-length="26">
+            <div class="thumb"></div><div class="thumb"></div><div class="thumb"></div><div class="thumb"></div><div class="thumb"></div><div class="thumb"></div>
+         </div>
+         <div class="more" style="visibility: hidden">More photos <a href="" title="Flickr" class="icon flickr"></a><a href="" title="YouTube" class="icon youtube"></a></div>
+      </div>
+   </div>
+   <script type="text/javascript">
+
+      function getElementsByClass(searchClass, node, tag) {
+         var result = new Array();
+         if ( node == null )
+            node = document;
+         if ( tag == null )
+            tag = '*';
+         var els = node.getElementsByTagName(tag);
+         var elsLen = els.length;
+
+         var pattern = new RegExp("(^|\\s)"+searchClass+"(\\s|$)");
+         for (i = 0, j = 0; i < elsLen; i++) {
+            if ( pattern.test(els[i].className) ) {
+               result[j] = els[i];
+               j++;
+            }
+         }
+         return result;
+      }
+
+      function fade(obj, start, stop, step, delay, callback) {
+         setTimeout(function() {
+            var t = start
+            if (start == 0) obj.style.display = 'block'
+            var timer = setInterval(function() {
+               t += step
+               setElementOpacity(obj, t)
+               if ((stop < start) && (t <= stop) || (stop > start) && (t >= stop)) {
+                  setElementOpacity(obj, stop)
+                  clearInterval(timer)
+                  if (stop == 0) obj.style.display = 'none'
+                  if (callback) callback()
+               }
+            }, 30)
+         }, delay)
+      }
+
+      function loadMore() {
+         var button = document.getElementById('page').getElementsByTagName('button')[0]
+         var p = button.parentNode
+         p.removeChild(button)
+         p.innerHTML += '<div class="thumb"></div><div class="thumb"></div><div class="thumb"></div><div class="thumb"></div><div class="thumb"></div><div class="thumb"></div>'
+         getElementsByClass('more', document.getElementById('page'), 'div')[0].style.visibility = ''
+
+         p = getElementsByClass('slider', document.getElementById('page6'), 'div')[0].children[0]
+         p.lastElementChild.style.marginRight = ''
+         p.innerHTML += '<div class="thumb"></div><div class="thumb"></div><div class="thumb"></div><div class="thumb"></div><div class="thumb"></div><div class="thumb"></div>'
+         XScroll.updateThumbPosition(p.parentNode)
+         
+         var thumbs = getElementsByClass('thumb', document.getElementById('page'), 'div')
+         for (var i = 0; i < thumbs.length; i++) {
+            setTimeout(function(obj) { return function() { obj.style.opacity = '1' } }(thumbs[i]), 300)
+            thumbs[i].onclick = function(index) {
+               return function() {
+                  PhotoViewer.open(index)
+               }
+            }(i%12)
+         }
+      }
+      
+      XScroll.init(getElementsByClass('slider', document.getElementById('page6'), 'div')[0])
+      XScroll.addListener(getElementsByClass('slider', document.getElementById('page6'), 'div')[0], 'scroll', function(x, y) {
+         var content = getElementsByClass('slider', document.getElementById('page6'), 'div')[0].children[0]
+         if (content.clientWidth - (x + content.parentNode.clientWidth) < 2000 && content.children.length < 12) {
+            loadMore()
+         }
+      })
+
+      window.onresize = function() { getElementsByClass('slider', document.getElementById('page'), 'div')[0].style.width = 'auto' }
+
+      PhotoViewer.init('photo_viewer')
+      PhotoViewer.setPhotos(['graphics/photo1.jpg', 'graphics/photo2.jpg', 'graphics/photo3.jpg', 'graphics/photo4.jpg', 'graphics/photo5.jpg', 'graphics/photo6.jpg', 'graphics/photo7.jpg', 'graphics/photo8.jpg', 'graphics/photo9.jpg', 'graphics/photo10.jpg', 'graphics/photo11.jpg', 'graphics/photo12.jpg'])
+      var thumbs = getElementsByClass('thumb', document.getElementById('page'), 'div')
+      for (var i = 0; i < thumbs.length; i++) {
+         thumbs[i].onclick = function(index) {
+            return function() {
+               PhotoViewer.open(index)
+            }
+         }(i%6)
+      }
+      document.getElementById('page').getElementsByTagName('button')[0].onclick = loadMore
+
+   </script>
+</body>
+</html>
